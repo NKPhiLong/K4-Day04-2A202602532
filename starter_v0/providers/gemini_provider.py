@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import time
 from typing import Any
 
 from providers.base import ModelResponse, ToolCall
@@ -78,6 +80,21 @@ class GeminiProvider:
         self.api_key_env = api_key_env
         self.default_model = default_model
 
+    def _generate_with_retry(self, client: Any, *, max_attempts: int = 10, **kwargs: Any) -> Any:
+        """Wait and retry on 429 so free-tier per-minute limits do not become provider_error cases."""
+        from google.genai import errors
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                return client.models.generate_content(**kwargs)
+            except errors.ClientError as exc:
+                if exc.code != 429 or attempt == max_attempts:
+                    raise
+                match = re.search(r"retryDelay'?\"?:\s*'?\"?(\d+)", str(exc))
+                delay = int(match.group(1)) + 1 if match else min(15 * attempt, 90)
+                print(f"  429 rate limit, retrying in {delay}s (attempt {attempt}/{max_attempts})", flush=True)
+                time.sleep(delay)
+
     def complete(
         self,
         messages: list[dict[str, str]],
@@ -106,7 +123,8 @@ class GeminiProvider:
             config_kwargs["tools"] = [types.Tool(function_declarations=declarations)]
 
         client = genai.Client(api_key=api_key)
-        resp = client.models.generate_content(
+        resp = self._generate_with_retry(
+            client,
             model=model or self.default_model,
             contents=contents,
             config=types.GenerateContentConfig(**config_kwargs),
