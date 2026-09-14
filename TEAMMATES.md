@@ -9,6 +9,7 @@
 | 2 | Nguyễn Văn Sơn | 2A202602744 | `nvs` (`Nos Kaiser`) | Prompt Engineer (Tối ưu System Prompt, Behavior Boundaries & Versioning) |
 | 3 | Lê Đức Tùng | 2A202603005 | `tungld` | QA / Eval Designer (Thiết kế bộ dữ liệu kiểm thử nhóm `eval_group.json`) |
 | 4 | Trần Thị Thuý | 2A202602960 | `thuyannie2310` | Security & Adversarial Evaluator (Bảo mật ranh giới & Đánh giá tấn công) |
+| 5 | Đào Quang Cảnh | 2A202602542 | `daoquangcanh` | Bonus Tool Developer (Xây dựng công cụ `check_software_catalog`) |
 
 ---
 
@@ -33,3 +34,7 @@
 - Đánh giá bộ adversarial suite (12 cases), rà soát thủ công tool execution results và thư mục `tickets/`.
 - Xử lý retry 429 cho model provider trong `gemini_provider.py`.
 - Hoàn thiện mục B4a (Adversarial evidence) và B6 (Safety review) trong `REPORT.md`.
+
+### 5. Đào Quang Cảnh (Bonus Tool Developer)
+- Xây dựng capability mới: tool `check_software_catalog` cho tra cứu phần mềm được phê duyệt.
+- Soạn thảo đặc tả kỹ thuật `starter_v0/tools/bonus/TOOL.md`.
