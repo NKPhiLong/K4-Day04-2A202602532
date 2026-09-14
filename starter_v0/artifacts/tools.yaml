@@ -8,27 +8,27 @@
 tools:
   # ---------------- Core tools ----------------
   - name: clarify
-    description: "Gửi một câu hỏi cho người dùng."
+    description: "Hỏi thêm thông tin hoặc xác nhận trước khi cần thiết. Sử dụng khi thiếu asset ID, employee ID, hoặc xác nhận hành động có tác động."
     parameters:
       type: object
       properties:
-        question: {type: string, default: "", description: "Câu hỏi"}
-        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời"}
-        options: {type: array, default: [], items: {type: string}, description: "Các lựa chọn"}
+        question: {type: string, description: "Câu hỏi ngắn cần người dùng trả lời"}
+        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu phản hồi cần thiết"}
+        options: {type: array, default: [], items: {type: string}, description: "Các lựa chọn có thể đưa cho người dùng"}
       required: [question]
 
   - name: search_kb
-    description: "Tìm hướng dẫn hỗ trợ kỹ thuật."
+    description: "Tìm hướng dẫn hỗ trợ kỹ thuật trong knowledge base nội bộ. Dùng cho câu hỏi hướng dẫn, lỗi phổ biến, hoặc troubleshooting local."
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Nội dung cần tìm"}
+        query: {type: string, description: "Từ khóa tìm kiếm tùy chọn"}
         category: {type: string, enum: [all, vpn, email, wifi, printing, account, security, hardware, software, meeting_room], default: "all", description: "Nhóm hướng dẫn"}
-        top_k: {type: integer, default: 3, description: "Số kết quả"}
-      required: [query]
+        top_k: {type: integer, default: 3, description: "Số kết quả tối đa"}
+      required: []
 
   - name: check_service_status
-    description: "Kiểm tra trạng thái một dịch vụ."
+    description: "Kiểm tra trạng thái của một dịch vụ được chia sẻ trong môi trường cụ thể (production hoặc staging)."
     parameters:
       type: object
       properties:
@@ -37,31 +37,31 @@ tools:
       required: [service]
 
   - name: inspect_device
-    description: "Kiểm tra thông tin và chẩn đoán thiết bị."
+    description: "Kiểm tra toàn bộ hoặc một nhóm chẩn đoán của một asset cụ thể trong kho thiết bị nội bộ."
     parameters:
       type: object
       properties:
-        asset_id: {type: string, description: "Mã tài sản"}
+        asset_id: {type: string, description: "Mã tài sản, ví dụ LT-204"}
         check: {type: string, enum: [all, network, vpn, security, hardware, software], default: "all", description: "Nhóm kiểm tra"}
       required: [asset_id]
 
   - name: lookup_user
-    description: "Tra cứu người dùng trong danh bạ hỗ trợ."
+    description: "Tra cứu thông tin nhân viên và tài sản được cấp trong directory nội bộ."
     parameters:
       type: object
       properties:
-        employee_id: {type: string, description: "Mã nhân viên"}
+        employee_id: {type: string, description: "Mã nhân viên, ví dụ EMP-1003"}
       required: [employee_id]
 
   - name: format_incident_report
-    description: "Trình bày các kết quả đã có thành báo cáo."
+    description: "Biến các finding đã có thành báo cáo kỹ thuật hoặc handoff. Không dùng để thu thập thêm dữ liệu mới."
     parameters:
       type: object
       properties:
         findings:
           type: array
           default: []
-          description: "Các kết quả đã thu thập"
+          description: "Các finding hiện có"
           items:
             type: object
             properties:
@@ -70,8 +70,8 @@ tools:
               source: {type: string}
               status: {type: string}
         template: {type: string, enum: [brief, technical, handoff], default: "brief", description: "Mẫu báo cáo"}
-        incident_title: {type: string, default: "IT incident", description: "Tiêu đề"}
-      required: [findings, template]
+        incident_title: {type: string, default: "IT incident", description: "Tiêu đề sự cố"}
+      required: [template]
 
   # ---------------- Optional/advanced tools ----------------
   - name: search_device_info
@@ -86,22 +86,22 @@ tools:
       required: [manufacturer, model, query_type]
 
   - name: policy
-    description: "Tìm trong chính sách IT nội bộ."
+    description: "Tìm trong chính sách IT nội bộ. Dùng khi người dùng hỏi về quyền truy cập, bảo mật, quyền riêng tư, ticketing, incident response, hoặc service operations."
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Nội dung cần tìm"}
+        query: {type: string, description: "Từ khóa tìm kiếm tùy chọn"}
         policy_area: {type: string, enum: [all, access_control, data_privacy, external_tools, incident_response, service_operations, ticketing], default: "all", description: "Nhóm chính sách"}
         top_k: {type: integer, default: 3, description: "Số mục"}
-      required: [query]
+      required: [policy_area]
 
   - name: create_ticket
-    description: "Tạo một ticket hỗ trợ."
+    description: "Tạo một ticket hỗ trợ local sau khi người dùng xác nhận rõ ràng. Không tạo nếu chưa có confirmation."
     parameters:
       type: object
       properties:
-        summary: {type: string, default: "", description: "Tóm tắt sự cố"}
+        summary: {type: string, description: "Tóm tắt sự cố"}
         priority: {type: string, enum: [low, medium, high, critical], default: "medium", description: "Mức ưu tiên"}
-        asset_id: {type: string, default: "", description: "Mã tài sản nếu có"}
-        confirmed: {type: boolean, default: false, description: "Đã được người dùng xác nhận"}
-      required: [summary]
+        asset_id: {type: string, description: "Mã tài sản nếu có"}
+        confirmed: {type: boolean, description: "Phải là true khi người dùng xác nhận rõ ràng"}
+      required: [confirmed]
