@@ -212,14 +212,14 @@ có thể đối chiếu đóng góp.
 
 ### Nguyễn Văn Sơn — 2A202602744
 
-- **Vai trò/phần việc được nhận:**
-- **Những gì tôi đã thay đổi trong repo chung:**
-- **File hoặc artifact liên quan:**
-- **Commit hash hoặc pull request:**
-- **Một quyết định kỹ thuật tôi đã đưa ra và lý do:**
-- **Khó khăn tôi gặp và cách tôi xử lý:**
-- **Điều tôi học được từ phần việc này:**
-- **Nếu làm lại, tôi sẽ cải thiện điều gì:**
+- **Vai trò/phần việc được nhận:** A — Prompt Engineer: nghiên cứu, thiết kế và tối ưu hóa `artifacts/system_prompt.md`, quản lý tài liệu hóa các phiên bản thử nghiệm prompt trong `version_log.csv`.
+- **Những gì tôi đã thay đổi trong repo chung:** xây dựng và lặp qua các phiên bản prompt (từ v1 đến v5); chuẩn hóa cấu trúc prompt theo dạng "Turn procedure" từng bước rõ ràng; thiết lập bộ quy tắc bắt buộc xác nhận người dùng trước khi gọi `create_ticket`; định nghĩa hành vi hỏi làm rõ (clarification) khi thiếu định danh thay vì đoán mò; bổ sung negative constraints để ngăn hallucination và over-triggering tool.
+- **File hoặc artifact liên quan:** `starter_v0/artifacts/system_prompt.md`, `starter_v0/artifacts/version_log.csv`.
+- **Commit hash hoặc pull request:** PR #1 (merge commit `7ef515c`, commit `12826f7`) và PR cập nhật self-reflection từ branch `contrib/nvs`.
+- **Một quyết định kỹ thuật tôi đã đưa ra và lý do:** chuyển đổi phong cách viết prompt từ mô tả văn xuôi tự do sang quy trình đánh số từng bước (Turn procedure checklist: Step 1 classify intent -> Step 2 validate required args -> Step 3 call tool or clarify -> Step 4 response). Lý do: model cỡ nhỏ (`gemini-2.5-flash` / `flash-lite`) xử lý logic theo checklist tốt hơn hẳn, giúp giảm hiện tượng bỏ sót bước kiểm tra confirmation và giảm thiểu gọi nhầm tool.
+- **Khó khăn tôi gặp và cách tôi xử lý:** gặp hiện tượng over-refusal (model từ chối luôn cả các ca hợp lệ như H17, H19 khi cố siết chặt an toàn) hoặc tự ý gọi `policy` trước khi từ chối (A05/A07). Tôi đã xử lý bằng cách phân định rõ ràng giữa "missing information" (cần hỏi thêm) và "adversarial prompt injection" (từ chối ngay mà không tra cứu), đồng thời phối hợp với Role B (Tool Schema) để nới lỏng description của tool thay vì chỉ ép vào system prompt.
+- **Điều tôi học được từ phần việc này:** prompt engineering trong ứng dụng tool-calling không chỉ là viết câu chữ mô tả, mà là thiết kế một bộ quy tắc điều hướng trạng thái (state machine). Càng viết chi tiết văn xuôi model càng dễ bị phân tâm; checklist ngắn gọn, rõ ràng theo thứ tự ưu tiên đem lại kết quả ổn định nhất (30/30 base suite).
+- **Nếu làm lại, tôi sẽ cải thiện điều gì:** xây dựng một script chạy kiểm thử hồi quy (regression test) nhanh cho các ca khó cục bộ trước khi chạy toàn bộ suite 30-case, tránh hao phí quota free tier và giảm thời gian chờ đợi giữa các vòng lặp prompt.
 
 ### Lê Đức Tùng — 2A202603005
 
